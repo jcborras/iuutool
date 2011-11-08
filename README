@@ -1,0 +1,106 @@
+
+General Information
+===================
+
+iuutool is a port of the WB Electronic's SDK for their Infinity USB
+Unlimited (iuu for short) smart card reader plus some samples and utility
+code. Besides that it also provides you with the functionality of the
+good and old nftytool for programming AVR and PIC cards using the iuu.
+
+
+Installation
+============
+
+See the file 'INSTALL'
+
+
+iuutool utilities: iuuterm
+==========================
+
+The iuuterm is a terminal for communicating with the IUU. Run it from
+the command line and call for the device detection and initialization
+routine:
+
+start
+
+Then you can for instance fetch the IUU firmware version by issuing
+the following commands: 
+
+write 01
+read 04
+
+For the product name you can use:
+
+write 02
+read 16
+
+And for the loader version:
+
+write 50
+read 04
+
+For the status register I would try:
+
+write 03
+read 01
+
+Setting the LED is easy:
+
+write 04 00 00 00 40 00 00 ff
+
+Setting the on-board frequency generator too:
+sf 3579000
+
+You can get serious by start using the phoenix mode... :
+write 49 02 98 01
+
+... changing its settings:
+write 5e 02 02 98 01
+
+... reseting the card ... :
+write 52 06 10 53
+
+... reading the card ATR length response from the phoenix UART:
+write 56
+read 1
+
+... and reading the complete ATR response (n is the last number you got):
+read n
+
+
+The source code for the SDK port is include/wbeiuu.h and lib/wbeiuu.c
+
+
+Using iuutool with Tcl/Tk
+===========================
+
+This release includes SWIG binding for Tcl/Tk if you are into high
+level scripting languages. IMHO they provide a better solution for
+building applications like iuuterm above. I would have added Python
+and PERL bindings but I lack the experience to provide a tidy and
+elegant solution, at least from the same swig interface file. If you
+want to give me a hand with that it will be great. 
+
+
+Demos using Tcl/Tk are in the lib/tcl/ directory. They include a clone
+of the LED.exe application available in the original SDK by WB
+Electronics. It is an excellent proof of concept when it comes to show
+how little script code can do the same than a hundred lines of low
+level language.
+
+
+How to report bugs
+==================
+
+Mail to jcborras@gmail.com
+
+
+Patches
+=======
+
+Mail them to jcborras@gmail.com
+
+
+
+
+

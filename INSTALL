@@ -1,0 +1,19 @@
+
+Simple install procedure
+========================
+
+   % tar -xzvf iuutool-x.y.z.tgz   # unpack the sources
+   % cd iuutool-x.y.z              # change to the toplevel directory
+   % make                          # build 
+
+Invocating make should build the library and some executables for
+testing in the test/ directory. Take a look at the source code in
+order to start using iuutool. There are also examples on how to use it
+with Tcl/Tk in the lib/tcl/ directory.
+
+This release contains SWIG bindings for Tcl/Tk. That means that if you
+don't have them installed in your system, you will get compilation
+errors. Should that happens do not panic. Go to lib/tcl, edit Makefile
+and follow the instructions. Uncommenting a specific line will solve
+your problems.
+

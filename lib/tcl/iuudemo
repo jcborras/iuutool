@@ -1,0 +1,101 @@
+#!/usr/bin/tclsh
+
+#!/bin/sh
+# Run wish from the users PATH \
+exec wish -f "$0" ${1+"$@"}
+
+puts "\nSimple demo script using an Infinity USB Unlimited with Tcl\n"
+
+load ./iuu.so
+puts stdout "iuu.so has been loaded"
+
+set r [iuu_ndevs]
+set error [error_code [lindex $r 0] ]
+set ndevs [lindex $r 1]
+
+if {0 == $error} {
+		puts "Number of iuu devices found: $ndevs"
+} else {
+		puts "There are not iuu devices attached"
+		exit
+}
+
+set myiuu [usb_infinity]
+
+set dev [expr $ndevs -1]
+
+set r [iuu_start $myiuu $dev]
+set error [error_code [lindex $r 0] ]
+if {0 == $error} {
+		puts "Device $dev was opened fine"
+} else {
+		puts "Device $dev could not be opened"
+		exit
+}
+
+set r [iuu_cts $myiuu]
+set error [error_code [lindex $r 0] ]
+if {0 == $error} {
+		puts "Device number $dev is ready"
+} else {
+		puts "Device number $dev is not ready"
+		exit
+}
+
+#after 4000 [set r [iuu_led $myiuu 0 1000 0 150]]
+
+set tmp "12345678901234567"
+set r [iuu_name $myiuu $tmp]
+set error [error_code [lindex $r 0] ]
+if {0 != $error} {
+		puts "Error while product name"
+} else {
+		puts "Product name: $tmp"
+}
+
+set tmp "12345"
+set r [iuu_firmware $myiuu $tmp]
+set error [error_code [lindex $r 0] ]
+if {0 != $error} {
+		puts "Error while retrieving firware version"
+} else {
+		puts "Firmware version: $tmp"
+}
+
+set tmp "1234"
+set r [iuu_loader $myiuu $tmp]
+set error [error_code [lindex $r 0] ]
+if {0 != $error} {
+		puts "Error while retrieving loader version"
+} else {
+		puts "Loader version: $tmp"
+}
+
+puts "Led FX"
+iuu_led $myiuu 9999    0    0 255
+after 2000
+iuu_led $myiuu    0 9999    0 255
+after 2000
+iuu_led $myiuu    0    0 9999 255
+after 2000
+iuu_led $myiuu 9999 9999    0  64
+after 2000 
+iuu_led $myiuu    0 9999 9999 192
+after 2000 
+iuu_led $myiuu 9999    0 9999 192
+after 2000
+
+set r [iuu_stop $myiuu]
+set error [error_code [lindex $r 0] ]
+if {0 == $error} {
+		puts "Device number $dev is closed"
+} else {
+		puts "Device number $dev could not be closed"
+		exit
+}
+
+
+
+
+
+

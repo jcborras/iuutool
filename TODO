@@ -1,0 +1,23 @@
+
+- WBE's SDK INFUNLTD_Read() has two different parameters:
+  bytes_to_read and bytes_actually_read. We don't and I wonder if that
+  is going to be a problem in the long run.
+  (Actually, it is: It is a shortcoming of libusb. Among other
+  annoyances you can read from the iuu when there is nothing to
+  read and no error is reported)
+
+- infinity_get_ep_descriptor() should process properly
+  USB_ENDPOINT_IN|OUT
+
+- All phoenix operations must be carried out after checking that the
+  IUU is in Phoenix mode.
+
+- the check 'if (!CheckSDKInput (hDevice))' at the original Win32 SDK
+  code is a handy function to ckeck the call integrity.
+
+- a 'char buffer[256]' as part of the iuu_device_handle would provide
+  encapsulation among other things like buffering.
+
+- Fishy usb_control_message (parm switch) for CTS
+
+

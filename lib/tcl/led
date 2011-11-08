@@ -1,0 +1,108 @@
+#!/bin/sh
+# Run wish from the users PATH \
+		exec wish -f "$0" ${1+"$@"}
+
+load ./iuu.so
+puts stdout {iuu.so has been loaded}
+
+set r [iuu_ndevs]
+set error [error_code [lindex $r 0] ]
+set ndevs [lindex $r 1]
+
+if {0 == $error} {
+		puts "Found $ndevs iuu devices"
+} else {
+		puts "There are not iuu devices attached"
+		exit
+}
+
+set myiuu [usb_infinity]
+
+set dev [expr $ndevs -1]
+
+set r [iuu_start $myiuu $dev]
+set error [error_code [lindex $r 0] ]
+if {0 == $error} {
+		puts "Device number $dev was opened fine"
+} else {
+		puts "Device number $dev could not be opened"
+		exit
+}
+
+set r [iuu_cts $myiuu]
+set error [error_code [lindex $r 0] ]
+if {0 == $error} {
+		puts "Device number $dev is ready"
+} else {
+		puts "Device number $dev is not ready"
+		exit
+}
+
+
+proc ShowValues {tmp} {
+		global r g b f myiuu
+		set nr [expr int(65535 * $r / 100)]
+		set ng [expr int(65535 * $g / 100)]
+		set nb [expr int(65535 * $b / 100)]
+		set nf [expr int(255 * $f / 100)]
+		#puts "R = $nr G = $ng B = $nb F = $nf"
+		iuu_led $myiuu $nr $ng $nb $nf
+}
+
+proc BailOut {tmp} {
+		global dev myiuu
+		set r [iuu_stop $myiuu]
+		set error [error_code [lindex $r 0] ]
+		if {0 == $error} {
+				puts "Device number $dev was closed"
+		} else {
+				puts "Device number $dev could not be closed"
+				exit
+		}
+		
+		destroy .
+}
+
+set sl 200
+set r 0
+set g 0
+set b 0
+set f 0
+
+set redscale [scale .rsc -from 100 -to 0 -length $sl -variable r \
+									-command "ShowValues" \
+									-orient vertical -label "Red" \
+									-showvalue true]
+
+set greenscale [scale .gsc -from 100 -to 0 -length $sl -variable g \
+										-command "ShowValues" \
+										-orient vertical -label "Green" \
+										-showvalue true ]
+
+set bluescale [scale .bsc -from 100 -to 0 -length $sl -variable b \
+									 -command "ShowValues" \
+									 -orient vertical -label "Blue" \
+									 -showvalue true]
+
+set freqscale [scale .fsc -from 100 -to 0 -length $sl -variable f \
+									 -command "ShowValues" \
+									 -orient vertical -label "Frequency" \
+									 -showvalue true]
+
+set quitbutton [button .b2 -text "Quit"  -command "BailOut 1"]
+
+# These values are a good example of the different behaviour of the
+# LED in saturation (some colors return earlier to the off state than
+# others). Remember that neither your retina nor diodes are not linear
+# devices ;-)
+$redscale set 20
+$greenscale set 30
+$bluescale set 60
+$freqscale set 50
+
+grid $redscale -row 0 -column 0
+grid $greenscale -row 0 -column 1
+grid $bluescale -row 0 -column 2
+grid $freqscale -row 0 -column 3
+
+grid $quitbutton -row 0 -column 4
